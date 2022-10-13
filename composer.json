@@ -1,0 +1,40 @@
+{
+    "name": "frosh/auto-keyword-linker",
+    "description": "a description",
+    "type": "shopware-platform-plugin",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "Frosh"
+        }
+    ],
+    "require": {
+        "shopware/core": "~6.4"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Frosh\\AutoKeywordLinker\\": "src/"
+        }
+    },
+    "extra": {
+        "shopware-plugin-class": "Frosh\\AutoKeywordLinker\\FroshAutoKeywordLinker",
+        "copyright": "Frosh",
+        "label": {
+            "de-DE": "FroshAutoKeywordLinker",
+            "en-GB": "FroshAutoKeywordLinker"
+        },
+        "description": {
+            "de-DE": "a description",
+            "en-GB": "a description"
+        },
+        "manufacturerLink": {
+            "de-DE": "https://acme.org",
+            "en-GB": "https://acme.org"
+        },
+        "supportLink": {
+            "de-DE": "https://acme.org",
+            "en-GB": "https://acme.org"
+        }
+    }
+}
