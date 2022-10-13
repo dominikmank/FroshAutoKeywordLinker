@@ -8,11 +8,22 @@
         <service id="Frosh\AutoKeywordLinker\Subscriber\CategoryIndexSubscriber">
             <argument type="service" id="category.repository" />
             <argument type="service" id="frosh_keywords.repository" />
+            <argument type="service" id="Frosh\AutoKeywordLinker\Service\KeywordContentUpdaterService" />
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Frosh\AutoKeywordLinker\Subscriber\ProductIndexSubscriber">
+            <argument type="service" id="product.repository" />
+            <argument type="service" id="frosh_keywords.repository" />
+            <argument type="service" id="Frosh\AutoKeywordLinker\Service\KeywordContentUpdaterService" />
             <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="Frosh\AutoKeywordLinker\Entity\FroshKeywordDefinition">
             <tag name="shopware.entity.definition"/>
         </service>
+
+        <service id="Frosh\AutoKeywordLinker\Service\KeywordContentUpdaterService"/>
+
     </services>
 </container>

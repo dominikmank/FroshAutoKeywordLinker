@@ -3,9 +3,9 @@
 namespace Frosh\AutoKeywordLinker\Subscriber;
 
 use Frosh\AutoKeywordLinker\Entity\FroshKeywordsEntity;
+use Frosh\AutoKeywordLinker\Service\KeywordContentUpdaterService;
 use Shopware\Core\Content\Category\CategoryEntity;
 use Shopware\Core\Content\Category\Event\CategoryIndexerEvent;
-use Shopware\Core\Content\Seo\SeoUrlPlaceholderHandler;
 use Shopware\Core\Framework\DataAbstractionLayer\Dbal\Common\RepositoryIterator;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -15,11 +15,13 @@ class CategoryIndexSubscriber implements EventSubscriberInterface
 {
     private EntityRepository $categoryRepository;
     private EntityRepository $froshKeywordsRepository;
+    private KeywordContentUpdaterService $contentUpdater;
 
-    public function __construct(EntityRepository $categoryRepository, EntityRepository $froshKeywordsRepository)
+    public function __construct(EntityRepository $categoryRepository, EntityRepository $froshKeywordsRepository, KeywordContentUpdaterService $contentUpdater)
     {
         $this->categoryRepository = $categoryRepository;
         $this->froshKeywordsRepository = $froshKeywordsRepository;
+        $this->contentUpdater = $contentUpdater;
     }
 
     public static function getSubscribedEvents(): array
@@ -52,46 +54,18 @@ class CategoryIndexSubscriber implements EventSubscriberInterface
                         continue;
                     }
 
-                    $document = new \DOMDocument();
-                    $document->loadHTML($description, LIBXML_HTML_NOIMPLIED + LIBXML_HTML_NODEFDTD + LIBXML_NOERROR);
-                    foreach ($document->getElementsByTagName('a') as $href) {
-                        if ($href->getAttribute('data-seolink') && $href->parentNode !== null) {
-                            $linkText = $document->createTextNode($href->textContent);
-                            $href->parentNode->insertBefore($linkText, $href);
-                            $href->parentNode->removeChild($href);
-                        }
+                    $updatedDescription = $this->contentUpdater->setPlaceholders($entity, $description);
+
+                    if ($updatedDescription === $description) {
+                        continue;
                     }
-                    $description = $document->saveHTML();
 
-                    if (strpos($description, $keyword) !== false) {
-                        $link = SeoUrlPlaceholderHandler::DOMAIN_PLACEHOLDER . '/';
-                        switch ($linkHref['entity']) {
-                            case 'product':
-                                $link .= 'product.detail/' . $linkHref['id'] . '#';
-                                break;
-                            case 'category':
-                                $link .= 'navigation/' . $linkHref['id'] . '#';
-                                break;
-                            case 'absolute_url':
-                                $link = $linkHref['url'];
-                                break;
-                        }
-
-                        $description = str_replace(
-                            $keyword,
-                            "<a href=\"$link\" data-seolink=\"true\">" . $keyword . '</a>',
-                            $description
-                        );
-
-                        $this->categoryRepository->upsert(
-                            [['id' => $category->getId(), 'description' => $description]],
-                            $event->getContext()
-                        );
-                    }
+                    $this->categoryRepository->upsert(
+                        [['id' => $category->getId(), 'description' => $description]],
+                        $event->getContext()
+                    );
                 }
             }
         }
-
-        dd($categories);
     }
 }
