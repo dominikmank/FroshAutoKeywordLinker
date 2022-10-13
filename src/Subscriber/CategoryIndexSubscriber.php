@@ -29,13 +29,12 @@ class CategoryIndexSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onCategoryIndex(CategoryIndexerEvent $event)
+    public function onCategoryIndex(CategoryIndexerEvent $event): void
     {
         $ids = $event->getIds();
         if (!count($ids)) {
             return;
         }
-
 
         $categories = $this->categoryRepository->search(new Criteria($ids), $event->getContext())->getEntities();
 
@@ -72,6 +71,9 @@ class CategoryIndexSubscriber implements EventSubscriberInterface
                                 break;
                             case 'category':
                                 $link .= 'navigation/' . $linkHref['id'] . '#';
+                                break;
+                            case 'absolute_url':
+                                $link = $linkHref['url'];
                                 break;
                         }
 

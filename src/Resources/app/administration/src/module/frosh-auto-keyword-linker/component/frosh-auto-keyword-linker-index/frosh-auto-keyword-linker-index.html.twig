@@ -1,0 +1,75 @@
+<!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+{% block sw_order_list %}
+<sw-page class="sw-order-list">
+    <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+    {% block sw_order_list_content %}
+    <template #content>
+
+        <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+        {% block sw_order_list_content_slot %}
+        <div class="sw-order-list__content">
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_order_list_grid %}
+            <sw-data-grid
+                ref="orderGrid"
+                :data-source="keywords"
+                :columns="keywordColumns"
+                :full-page="true"
+                :show-settings="true"
+                :show-selection="true"
+                :sort-by="currentSortBy"
+                :sort-direction="sortDirection"
+                :is-loading="isLoading"
+                :allow-column-edit="true"
+                identifier="sw-order-list"
+                :disable-data-fetching="true"
+                :maximum-select-items="100"
+            >
+            </sw-data-grid>
+            {% endblock %}
+
+            <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->
+            {% block sw_order_list_empty_state %}
+                <template v-if="!isLoading && !total">
+                    <sw-empty-state
+                        v-if="filterCriteria.length || isValidTerm(term)"
+                        :title="$tc('sw-empty-state.messageNoResultTitle')"
+                    >
+                        <template #icon>
+                            <img
+                                :src="'/administration/static/img/empty-states/order-empty-state.svg' | asset"
+                                :alt="$tc('sw-empty-state.messageNoResultTitle')"
+                            >
+                        </template>
+
+                        <template #default>
+                            {{ $tc('sw-empty-state.messageNoResultSublineBefore') }}
+                            <router-link
+                                class="sw-empty-state__description-link"
+                                :to="{ name: 'sw.profile.index.searchPreferences' }"
+                            >
+                                {{ $tc('sw-empty-state.messageNoResultSublineLink') }}
+                            </router-link>
+                            {{ $tc('sw-empty-state.messageNoResultSublineAfter') }}
+                        </template>
+                    </sw-empty-state>
+                    <sw-empty-state
+                        v-else
+                        :title="$tc('sw-order.list.messageEmpty')"
+                    >
+                        <template #icon>
+                            <img
+                                :src="'/administration/static/img/empty-states/order-empty-state.svg' | asset"
+                                :alt="$tc('sw-order.list.messageEmpty')"
+                            >
+                        </template>
+                    </sw-empty-state>
+                </template>
+            {% endblock %}
+        </div>
+        {% endblock %}
+    </template>
+    {% endblock %}
+</sw-page>
+{% endblock %}
