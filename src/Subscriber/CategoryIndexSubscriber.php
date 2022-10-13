@@ -9,7 +9,6 @@ use Shopware\Core\Content\Seo\SeoUrlPlaceholderHandler;
 use Shopware\Core\Framework\DataAbstractionLayer\Dbal\Common\RepositoryIterator;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CategoryIndexSubscriber implements EventSubscriberInterface
@@ -50,6 +49,20 @@ class CategoryIndexSubscriber implements EventSubscriberInterface
                 /** @var CategoryEntity $category */
                 foreach ($categories as $category) {
                     $description = $category->getDescription();
+                    if (!$description) {
+                        continue;
+                    }
+
+                    $document = new \DOMDocument();
+                    $document->loadHTML($description, LIBXML_HTML_NOIMPLIED + LIBXML_HTML_NODEFDTD + LIBXML_NOERROR);
+                    foreach ($document->getElementsByTagName('a') as $href) {
+                        if ($href->getAttribute('data-seolink') && $href->parentNode !== null) {
+                            $linkText = $document->createTextNode($href->textContent);
+                            $href->parentNode->insertBefore($linkText, $href);
+                            $href->parentNode->removeChild($href);
+                        }
+                    }
+                    $description = $document->saveHTML();
 
                     if (strpos($description, $keyword) !== false) {
                         $link = SeoUrlPlaceholderHandler::DOMAIN_PLACEHOLDER . '/';
@@ -62,10 +75,16 @@ class CategoryIndexSubscriber implements EventSubscriberInterface
                                 break;
                         }
 
-                        $description = str_replace($keyword, "<a href=\"$link\">" . $keyword . '</a>', $description);
+                        $description = str_replace(
+                            $keyword,
+                            "<a href=\"$link\" data-seolink=\"true\">" . $keyword . '</a>',
+                            $description
+                        );
 
                         $this->categoryRepository->upsert(
-                            [['id' => $category->getId(), 'description' => $description]], $event->getContext());
+                            [['id' => $category->getId(), 'description' => $description]],
+                            $event->getContext()
+                        );
                     }
                 }
             }
