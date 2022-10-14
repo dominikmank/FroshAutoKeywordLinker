@@ -37,13 +37,15 @@ class KeywordContentUpdaterService
                     break;
             }
 
+            $no_follow = $keyword->getNofollow() ? ' rel="nofollow"' : '';
+            $target_blank = $keyword->getTargetBlank() ? ' target="_blank"' : '';
+
             return str_replace(
                 $keyword->getKeyword(),
-                "<a href=\"$link\" data-seolink=\"true\">" . $keyword->getKeyword() . '</a>',
+                "<a href=\"". $link . "\"". $no_follow . $target_blank . " data-seolink=\"true\">" . $keyword->getKeyword() . "</a>",
                 $html
             );
         }
-
         return $html;
     }
 }

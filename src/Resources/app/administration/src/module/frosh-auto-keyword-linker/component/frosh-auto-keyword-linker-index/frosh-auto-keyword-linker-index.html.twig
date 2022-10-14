@@ -26,7 +26,47 @@
                 :disable-data-fetching="true"
                 :maximum-select-items="100"
             >
+                <template #column-target_blank="{ item, isInlineEdit }">
+
+                    {% block sw_property_list_grid_columns_filterable_content %}
+
+                            <sw-icon
+                                    v-if="item.target_blank"
+                                    name="regular-checkmark-xs"
+                                    small
+                                    class="is--active"
+                            />
+                            <sw-icon
+                                    v-else
+                                    name="regular-times-s"
+                                    small
+                                    class="is--inactive"
+                            />
+
+                    {% endblock %}
+                </template>
+
+                <template #column-no_follow="{ item, isInlineEdit }">
+
+                    {% block sw_property_list_grid_columns_filterable_content %}
+
+                        <sw-icon
+                                v-if="item.no_follow"
+                                name="regular-checkmark-xs"
+                                small
+                                class="is--active"
+                        />
+                        <sw-icon
+                                v-else
+                                name="regular-times-s"
+                                small
+                                class="is--inactive"
+                        />
+
+                    {% endblock %}
+                </template>
             </sw-data-grid>
+
             {% endblock %}
 
             <!-- eslint-disable-next-line sw-deprecation-rules/no-twigjs-blocks -->

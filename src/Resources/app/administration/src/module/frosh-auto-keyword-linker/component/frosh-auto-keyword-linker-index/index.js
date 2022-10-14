@@ -59,7 +59,21 @@ Component.register('frosh-auto-keyword-linker-index', {
                 property: 'keyword',
                 label: 'keyword',
                 allowResize: true,
-            }
+            },
+            {
+                property: 'targetBlank',
+                label: 'target_blank',
+                inlineEdit: 'boolean',
+                allowResize: true,
+                align: 'center',
+            },
+                {
+                    property: 'noFollow',
+                    label: 'no_follow',
+                    inlineEdit: 'boolean',
+                    allowResize: true,
+                    align: 'center',
+                }
             ];
         }
     }
