@@ -45,25 +45,26 @@ class CategoryIndexSubscriber implements EventSubscriberInterface
         while ($result = $iterator->fetch()) {
             /** @var FroshKeywordsEntity $entity */
             foreach ($result->getEntities() as $entity) {
-                $keyword = $entity->getKeyword();
-                $linkHref = $entity->getTargetType();
+
                 /** @var CategoryEntity $category */
                 foreach ($categories as $category) {
                     $description = $category->getDescription();
+
                     if (!$description) {
                         continue;
                     }
 
                     $updatedDescription = $this->contentUpdater->setPlaceholders($entity, $description);
 
-                    if ($updatedDescription === $description) {
-                        continue;
-                    }
+                    if ($description !== $updatedDescription) {
 
-                    $this->categoryRepository->upsert(
-                        [['id' => $category->getId(), 'description' => $description]],
-                        $event->getContext()
-                    );
+                        $this->categoryRepository->upsert(
+                            [
+                                ['id' => $category->getId(), 'description' => $updatedDescription]
+                            ],
+                            $event->getContext()
+                        );
+                    }
                 }
             }
         }
